@@ -5,6 +5,9 @@ import logging
 # Constants for timing
 WAITING_TO_SERIAL_CONNECTION = 2
 WAITING_TO_SERIAL_RESPONSE = 0.1
+DEFAULT_VIBRATING_TIME = 1
+STOP_VIBRATING = 0
+START_VIBRATING = 1
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -67,6 +70,46 @@ class Handmanager:
             logger.error(f"Error while sending vibrate command: {e}")
             return None
 
+    def start_vibrate(self, button_number):
+        """
+        Start vibrating the specified button.
+        
+        :param button_number: The button number to start vibrating (e.g., 1, 2, 3, etc.)
+        """
+        logger.info(f"Starting vibration on button {button_number}...")
+        return self.vibrate(button_number, 1)  # Sends the command to start vibrating
+
+    def stop_vibrate(self, button_number):
+        """
+        Stop vibrating the specified button.
+        
+        :param button_number: The button number to stop vibrating (e.g., 1, 2, 3, etc.)
+        """
+        logger.info(f"Stopping vibration on button {button_number}...")
+        return self.vibrate(button_number, 0)  # Sends the command to stop vibrating
+    
+    def vibrate_with_duration(self, button_number, duration=DEFAULT_VIBRATING_TIME):
+        """
+        Start vibrating a specified button and stop after a given duration.
+        
+        :param button_number: The button number to vibrate (e.g., 1, 2, 3, etc.)
+        :param duration: The duration in seconds for the vibration to last.
+        """
+        try:
+            # Start vibrating the button
+            logger.info(f"Starting vibration on button {button_number} for {duration} seconds...")
+            self.start_vibrate(button_number)
+            
+            # Wait for the specified duration
+            time.sleep(duration)
+            
+            # Stop vibrating the button after the duration
+            self.stop_vibrate(button_number)
+            logger.info(f"Stopped vibration on button {button_number}.")
+        except Exception as e:
+            logger.error(f"Error while vibrating button {button_number} for {duration} seconds: {e}")
+            return None
+    
     def close(self):
         """
         Close the serial connection.
