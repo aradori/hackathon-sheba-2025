@@ -43,19 +43,28 @@ class Handmanager:
             logger.error(f"Error while sending 'click' command: {e}")
             return None
 
-    def vibrate(self):
+    def vibrate(self, button_number, state):
         """
-        Send a 'vibrate' command to the device and return the response.
+        Send a 'vibrate' command to the device to start or stop vibrating a specified button.
+        
+        :param button_number: The button number to vibrate (e.g., 1, 2, 3, etc.)
+        :param state: The state of vibration (1 to start vibrating, 0 to stop vibrating)
         """
         try:
-            logger.debug("Sending 'vibrate' command...")
-            self.serial_connection.write(b'vibrate')  # Sending 'vibrate' command as byte string
+            # Construct the command to send
+            command = f"{button_number} {state}\n"
+            logger.debug(f"Sending vibrate command: {command.strip()}...")
+
+            # Send the command to the serial port
+            self.serial_connection.write(command.encode())
             time.sleep(WAITING_TO_SERIAL_RESPONSE)  # Wait a bit for the device to respond
+
+            # Read and log the response from the device
             response = self.serial_connection.readline().decode('utf-8').strip()
-            logger.info(f"Received response to 'vibrate' command: {response}")
+            logger.info(f"Received response to vibrate command: {response}")
             return response
         except Exception as e:
-            logger.error(f"Error while sending 'vibrate' command: {e}")
+            logger.error(f"Error while sending vibrate command: {e}")
             return None
 
     def close(self):
